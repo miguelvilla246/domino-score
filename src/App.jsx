@@ -57,7 +57,7 @@ const PLAYER_COLORS = ["#f4c430", "#34d399", "#f472b6", "#a78bfa"];
 
 const T = {
   en: {
-    appName: "DOMINÓS",
+    appName: "DOMINOES",
     tagline: "Score Keeper",
     playersTeams: "Players / Teams",
     teams: "Teams",
@@ -83,7 +83,7 @@ const T = {
     placeholders: ["Us", "Them", "Player 3", "Player 4"],
   },
   es: {
-    appName: "DOMINÓS",
+    appName: "DOMINÓ",
     tagline: "Marcador",
     playersTeams: "Jugadores / Equipos",
     teams: "Equipos",
