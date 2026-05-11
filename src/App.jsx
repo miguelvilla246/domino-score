@@ -84,6 +84,12 @@ function Confetti({ active }) {
 export default function DominoScore() {
   const [screen, setScreen] = useState("setup"); // setup | game | history | winner
   const [themeIdx, setThemeIdx] = useState(0);
+
+  useEffect(() => {
+    document.body.style.background = THEMES[themeIdx].bg;
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+  }, [themeIdx]);
   const [winScore, setWinScore] = useState(200);
   const [numPlayers, setNumPlayers] = useState(2);
   const [playerNames, setPlayerNames] = useState(["Team A", "Team B", "Player 3", "Player 4"]);
