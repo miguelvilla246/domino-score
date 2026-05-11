@@ -3,6 +3,7 @@ html, body {
   padding: 0;
   background-color: #0e0e0f;
   min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 
 #root {
