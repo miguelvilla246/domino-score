@@ -198,6 +198,7 @@ export default function DominoScore() {
   const [round, setRound] = useState(1);
   const [editingRound, setEditingRound] = useState(null);
   const [editInputs, setEditInputs] = useState(["", "", "", ""]);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   const theme = THEMES[themeIdx];
   const tx = T[lang];
@@ -224,6 +225,7 @@ export default function DominoScore() {
     setWinner(null);
     setRound(1);
     setEditingRound(null);
+    setConfirmReset(false);
     setScreen("game");
   };
 
@@ -293,12 +295,12 @@ export default function DominoScore() {
     setWinner(null);
     setRound(1);
     setEditingRound(null);
+    setConfirmReset(false);
     setScreen("game");
   };
 
   const leadingPlayer = scores.indexOf(Math.max(...scores));
 
-  // Fixed quick-add handler — targets a specific player by index
   const handleQuickAdd = (playerIdx, value) => {
     setInputs(prev => {
       const next = [...prev];
@@ -336,6 +338,8 @@ export default function DominoScore() {
         .btn:active { transform: translateY(0) scale(0.97); filter: brightness(0.9); }
         .screen-enter { animation: screenEnter 0.4s cubic-bezier(.4,0,.2,1) both; }
         @keyframes screenEnter { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+        .confirm-enter { animation: confirmEnter 0.2s ease both; }
+        @keyframes confirmEnter { from{opacity:0;transform:scale(0.97)} to{opacity:1;transform:scale(1)} }
         input {
           background: rgba(255,255,255,0.05);
           border: 1.5px solid rgba(255,255,255,0.12);
@@ -604,11 +608,9 @@ export default function DominoScore() {
               <div style={{ fontSize: 10, color: theme.muted, marginBottom: 14, letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
                 {tx.addRoundScores}
               </div>
-
               <div style={{ display: "grid", gridTemplateColumns: `repeat(${numPlayers}, 1fr)`, gap: 12 }}>
                 {Array.from({ length: numPlayers }).map((_, playerIdx) => (
                   <div key={playerIdx} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {/* Player label */}
                     <div style={{
                       fontSize: 10, textAlign: "center",
                       color: PLAYER_COLORS[playerIdx], fontWeight: 700, letterSpacing: 1,
@@ -616,8 +618,6 @@ export default function DominoScore() {
                     }}>
                       {playerNames[playerIdx]}
                     </div>
-
-                    {/* Input */}
                     <input
                       type="number"
                       inputMode="numeric"
@@ -634,8 +634,6 @@ export default function DominoScore() {
                         textShadow: `0 0 20px ${PLAYER_COLORS[playerIdx]}66`,
                       }}
                     />
-
-                    {/* Quick-add buttons — each targets only this player */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 4 }}>
                       {[5, 10, 15, 20, 25, 30].map(v => (
                         <button
@@ -673,12 +671,44 @@ export default function DominoScore() {
               }}>{tx.addScores}</button>
             </div>
 
-            <button className="btn" onClick={resetGame} style={{
-              padding: "11px", borderRadius: 12, fontSize: 12,
-              background: "transparent", color: "rgba(255,255,255,0.2)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              fontFamily: "'DM Sans', sans-serif", letterSpacing: 1,
-            }}>{tx.resetGame}</button>
+            {/* Reset / Confirm Reset */}
+            {!confirmReset ? (
+              <button className="btn" onClick={() => setConfirmReset(true)} style={{
+                padding: "11px", borderRadius: 12, fontSize: 12,
+                background: "transparent", color: "rgba(255,255,255,0.2)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                fontFamily: "'DM Sans', sans-serif", letterSpacing: 1,
+              }}>{tx.resetGame}</button>
+            ) : (
+              <div className="confirm-enter" style={{
+                background: "rgba(255,255,255,0.04)", borderRadius: 14,
+                padding: "14px 16px", border: "1px solid rgba(255,255,255,0.1)",
+                display: "flex", flexDirection: "column", gap: 10,
+              }}>
+                <div style={{
+                  textAlign: "center", fontSize: 13,
+                  color: theme.text, fontFamily: "'DM Sans', sans-serif",
+                  letterSpacing: 0.5, fontWeight: 600,
+                }}>
+                  {lang === "en" ? "Are you sure?" : "¿Estás seguro?"}
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button className="btn" onClick={resetGame} style={{
+                    flex: 1, padding: "12px", borderRadius: 10,
+                    background: "rgba(255,60,60,0.15)", color: "#ff6b6b",
+                    fontFamily: "'Bebas Neue', serif", fontSize: 18, letterSpacing: 2,
+                    border: "1px solid rgba(255,60,60,0.25)",
+                  }}>{lang === "en" ? "Yes" : "Sí"}</button>
+                  <button className="btn" onClick={() => setConfirmReset(false)} style={{
+                    flex: 1, padding: "12px", borderRadius: 10,
+                    background: "rgba(255,255,255,0.06)", color: theme.text,
+                    fontFamily: "'Bebas Neue', serif", fontSize: 18, letterSpacing: 2,
+                    border: "1px solid rgba(255,255,255,0.1)",
+                  }}>{lang === "en" ? "No" : "No"}</button>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 
