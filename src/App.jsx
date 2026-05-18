@@ -634,41 +634,43 @@ export default function DominoScore() {
             }}>
               <div style={{ fontSize: 10, color: theme.muted, marginBottom: 14, letterSpacing: 2, textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
                 {tx.addRoundScores}
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: `repeat(${numPlayers}, 1fr)`, gap: 10, marginBottom: 14 }}>
-                {Array.from({ length: numPlayers }).map((_, i) => (
-                  <div key={i}>
-                    <div style={{
-                      fontSize: 10, marginBottom: 6, textAlign: "center",
-                      color: PLAYER_COLORS[i], fontWeight: 700, letterSpacing: 1,
-                      fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
-                    }}>
-                      {playerNames[i]}
-                    </div>
-                    <input
-                      type="number" inputMode="numeric"
-                      value={inputs[i]}
-                      onChange={e => setInputs(inp => { const n=[...inp]; n[i]=e.target.value; return n; })}
-                      placeholder="0" min="0"
-                      style={{ color: PLAYER_COLORS[i], textShadow: `0 0 20px ${PLAYER_COLORS[i]}66` }}
-                    />
+                          </div>
+                    <div style={{ display: "grid", gridTemplateColumns: `repeat(${numPlayers}, 1fr)`, gap: 10, marginBottom: 14 }}>
+              {Array.from({ length: numPlayers }).map((_, i) => (
+                <div key={i} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{
+                    fontSize: 10, marginBottom: 6, textAlign: "center",
+                    color: PLAYER_COLORS[i], fontWeight: 700, letterSpacing: 1,
+                    fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
+                  }}>
+                    {playerNames[i]}
                   </div>
-                ))}
-              </div>
-
-              {/* Quick-add grid */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }}>
-                {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map(v => (
-                  <button key={v} className="quick-btn" onClick={() => {
-                    setInputs(inp => {
-                      const n = [...inp];
-                      const idx = n.findIndex(x => x === "" || x === "0" || x === 0);
-                      if (idx !== -1) n[idx] = String(v);
-                      return n;
-                    });
-                  }}>{v}</button>
-                ))}
-              </div>
+                  <input
+                    type="number" inputMode="numeric"
+                    value={inputs[i]}
+                    onChange={e => setInputs(inp => { const n=[...inp]; n[i]=e.target.value; return n; })}
+                    placeholder="0" min="0"
+                    style={{ color: PLAYER_COLORS[i], textShadow: `0 0 20px ${PLAYER_COLORS[i]}66` }}
+                  />
+                  {/* Per-player quick add */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 4 }}>
+                  {[5, 10, 15, 20, 25, 30].map(v => {
+                    const playerIdx = i;
+                    return (
+                      <button key={v} className="quick-btn" onClick={() => {
+                        setInputs(inp => {
+                          const n = [...inp];
+                          n[playerIdx] = String(v);
+                          return n;
+                        });
+                      }} style={{ fontSize: 13, padding: "7px 0", borderColor: `${PLAYER_COLORS[playerIdx]}22` }}>
+                        {v}
+                      </button>
+                    );
+                  })}
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Action buttons */}
