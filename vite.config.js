@@ -91,11 +91,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.svg'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Dominó Score Keeper',
         short_name: 'Dominó',
-        description: 'Track domino game scores, resume active games, and keep your matches organized.',
+        description: 'Track domino game scores and resume active games.',
         theme_color: '#0e0e0f',
         background_color: '#0e0e0f',
         display: 'standalone',
