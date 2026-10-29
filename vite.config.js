@@ -7,24 +7,10 @@ function dominoPersistence() {
     name: 'domino-persistence',
     enforce: 'pre',
     transform(code, id) {
-      if (!id.endsWith('/src/App.jsx')) return null
+      const normalizedId = id.replace(/\\/g, '/')
+      if (!normalizedId.includes('/src/App.jsx')) return null
 
-      const originalState = `export default function DominoScore() {
-  const [lang, setLang] = useState("en");
-  const [screen, setScreen] = useState("setup");
-  const [themeIdx, setThemeIdx] = useState(0);
-  const [winScore, setWinScore] = useState(200);
-  const [numPlayers, setNumPlayers] = useState(2);
-  const [playerNames, setPlayerNames] = useState(["Us", "Them", "Player 3", "Player 4"]);
-  const [scores, setScores] = useState([0, 0, 0, 0]);
-  const [history, setHistory] = useState([]);
-  const [inputs, setInputs] = useState(["", "", "", ""]);
-  const [winner, setWinner] = useState(null);
-  const [confetti, setConfetti] = useState(false);
-  const [round, setRound] = useState(1);
-  const [editingRound, setEditingRound] = useState(null);
-  const [editInputs, setEditInputs] = useState(["", "", "", ""]);
-  const [confirmReset, setConfirmReset] = useState(false);`
+      const statePattern = /export default function DominoScore\(\) \{[\s\S]*?const \[confirmReset, setConfirmReset\] = useState\(false\);/
 
       const persistedState = `const STORAGE_KEY = "domino-score-active-game-v1";
 
@@ -54,21 +40,20 @@ export default function DominoScore() {
   const [editInputs, setEditInputs] = useState(["", "", "", ""]);
   const [confirmReset, setConfirmReset] = useState(false);`
 
-      if (!code.includes(originalState)) {
-        this.warn('Domino persistence state block was not found; skipping persistence injection.')
-        return null
+      if (!statePattern.test(code)) {
+        this.error('Domino persistence injection failed: state block not found in src/App.jsx')
       }
 
-      let next = code.replace(originalState, persistedState)
+      let next = code.replace(statePattern, persistedState)
 
-      const effectAnchor = `  useEffect(() => {
+      const effectPattern = /  useEffect\(\(\) => \{\n    document\.body\.style\.background = theme\.bg;\n    document\.body\.style\.margin = "0";\n    document\.body\.style\.padding = "0";\n    document\.body\.style\.minHeight = "100vh";\n  \}, \[themeIdx\]\);/
+
+      const persistenceEffect = `  useEffect(() => {
     document.body.style.background = theme.bg;
     document.body.style.margin = "0";
     document.body.style.padding = "0";
     document.body.style.minHeight = "100vh";
-  }, [themeIdx]);`
-
-      const persistenceEffect = `${effectAnchor}
+  }, [themeIdx]);
 
   useEffect(() => {
     try {
@@ -90,12 +75,16 @@ export default function DominoScore() {
     }
   }, [lang, screen, themeIdx, winScore, numPlayers, playerNames, scores, history, inputs, winner, round]);`
 
-      next = next.replace(effectAnchor, persistenceEffect)
+      if (!effectPattern.test(next)) {
+        this.error('Domino persistence injection failed: theme effect anchor not found in src/App.jsx')
+      }
+
+      next = next.replace(effectPattern, persistenceEffect)
       return { code: next, map: null }
     },
   }
 }
- 
+
 export default defineConfig({
   plugins: [
     dominoPersistence(),
